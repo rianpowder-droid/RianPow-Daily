@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RianPow Daily</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0e17;
+            --fg: #e6edf3;
+            --accent: #f778ba;
+            --accent2: #79c0ff;
+            --accent3: #56d364;
+            --border: #30363d;
+            --card: #161b22;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Animated gradient background */
+        .bg-animated {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, #0a0e17, #161b22, #0d1117, #1a1f2e);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: 0;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        /* Floating particles */
+        .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; }
+        .particle {
+            position: absolute; width: 4px; height: 4px; background: var(--accent);
+            border-radius: 50%; animation: float 10s infinite; opacity: 0.6;
+        }
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+        }
+
+        .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+        /* Header */
+        header {
+            text-align: center; padding: 80px 20px 60px;
+            position: relative;
+        }
+        .logo {
+            font-size: 5em; font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; animation: logoGlow 3s ease-in-out infinite;
+        }
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(247,120,186,0.5)); }
+            50% { filter: drop-shadow(0 0 40px rgba(121,192,255,0.5)); }
+        }
+        .subtitle { color: #8b949e; font-size: 1.3em; margin-top: 15px; }
+        .tagline { color: var(--accent3); font-size: 1.1em; margin-top: 10px; }
+
+        /* Navigation */
+        nav {
+            display: flex; justify-content: center; gap: 15px; margin: 30px 0; flex-wrap: wrap;
+        }
+        nav button {
+            background: rgba(22,27,34,0.8); color: var(--fg); border: 2px solid var(--border);
+            padding: 12px 24px; font-family: inherit; font-size: 1em; cursor: pointer;
+            transition: all 0.3s; border-radius: 8px; backdrop-filter: blur(10px);
+        }
+        nav button:hover, nav button.active {
+            border-color: var(--accent); color: var(--accent);
+            background: rgba(247,120,186,0.1); transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(247,120,186,0.2);
+        }
+
+        /* Sections */
+        .section { display: none; animation: fadeIn 0.6s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card {
+            background: rgba(22,27,34,0.7); border: 1px solid var(--border);
+            border-radius: 12px; padding: 30px; margin: 20px 0;
+            backdrop-filter: blur(10px); transition: all 0.3s;
+        }
+        .card:hover { border-color: var(--accent); box-shadow: 0 0 30px rgba(247,120,186,0.1); }
+        h2 { color: var(--accent2); margin-bottom: 20px; font-size: 2em; }
+        h3 { color: var(--accent); margin: 15px 0 10px; }
+
+        /* Skills */
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; }
+        .skill-card {
+            background: rgba(22,27,34,0.5); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; text-align: center; cursor: pointer;
+            transition: all 0.4s; position: relative; overflow: hidden;
+        }
+        .skill-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(247,120,186,0.1));
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .skill-card:hover::before { opacity: 1; }
+        .skill-card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--accent); }
+        .skill-card .icon { font-size: 3em; display: block; margin-bottom: 10px; }
+        .skill-card .name { font-weight: 600; font-size: 1.1em; }
+
+        /* Projects */
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .project-card {
+            background: rgba(22,27,34,0.5); border: 1px solid var(--border);
+            border-radius: 12px; padding: 30px; transition: all 0.4s; cursor: pointer;
+        }
+        .project-card:hover { border-color: var(--accent2); transform: translateY(-8px); box-shadow: 0 10px 40px rgba(121,192,255,0.15); }
+        .project-card h3 { color: var(--accent2); font-size: 1.3em; }
+        .project-card p { color: #8b949e; margin: 12px 0; line-height: 1.6; }
+        .tag { display: inline-block; background: rgba(121,192,255,0.1); color: var(--accent2); padding: 4px 12px; margin: 4px; font-size: 0.85em; border-radius: 20px; border: 1px solid rgba(121,192,255,0.3); }
+
+        /* Interactive Elements */
+        .interactive-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .interactive-card { text-align: center; padding: 40px; }
+        .counter-display { font-size: 5em; font-weight: 900; color: var(--accent); text-shadow: 0 0 30px rgba(247,120,186,0.5); margin: 20px 0; }
+        .btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff; border: none; padding: 15px 40px; font-size: 1.2em;
+            font-family: inherit; font-weight: bold; cursor: pointer; border-radius: 8px;
+            transition: all 0.3s; margin: 10px;
+        }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 5px 25px rgba(247,120,186,0.4); }
+        .btn:active { transform: scale(0.95); }
+
+        /* Color picker */
+        .color-box {
+            width: 100%; height: 200px; border-radius: 12px; margin: 20px 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5em; font-weight: bold; transition: background 0.3s;
+        }
+
+        /* Typing effect */
+        .typing-text { font-size: 1.5em; color: var(--accent3); min-height: 2em; }
+
+        /* Footer */
+        footer { text-align: center; padding: 50px; color: #8b949e; margin-top: 40px; border-top: 1px solid var(--border); }
+        footer .green { color: var(--accent3); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 3em; }
+            .logo { font-size: 3.5em; }
+            nav button { padding: 8px 16px; font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="particles" id="particles"></div>
+    <div class="container">
+        <header>
+            <div class="logo">RIANPOW</div>
+            <p class="subtitle">Developer & Creator</p>
+            <p class="tagline">Building the future, one commit at a time 🚀</p>
+        </header>
+
+        <nav>
+            <button class="active" onclick="showSection('home')">Home</button>
+            <button onclick="showSection('about')">About</button>
+            <button onclick="showSection('skills')">Skills</button>
+            <button onclick="showSection('projects')">Projects</button>
+            <button onclick="showSection('playground')">🎮 Playground</button>
+            <button onclick="showSection('contact')">Contact</button>
+        </nav>
+
+        <div id="home" class="section active">
+            <div class="card">
+                <h2>👋 Welcome!</h2>
+                <p>This is my daily-updated portfolio website. Every day brings something new!</p>
+                <br>
+                <p class="typing-text" id="typingText"></p>
+            </div>
+            <div class="interactive-grid">
+                <div class="card interactive-card">
+                    <h3>🖱️ Click Counter</h3>
+                    <div class="counter-display" id="counterValue">0</div>
+                    <button class="btn" onclick="incrementCounter()">CLICK!</button>
+                    <button class="btn" onclick="resetCounter()" style="background: linear-gradient(135deg, #f85149, #da3633);">Reset</button>
+                </div>
+                <div class="card interactive-card">
+                    <h3>🎨 Color Picker</h3>
+                    <div class="color-box" id="colorBox" style="background: linear-gradient(135deg, #f778ba, #79c0ff);">
+                        Hover me!
+                    </div>
+                    <button class="btn" onclick="randomColor()">Random Color</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="about" class="section">
+            <div class="card">
+                <h2>⚡ About Me</h2>
+                <p>Hi! I'm RianPow, a developer who loves building things. This portfolio is updated daily with new features and improvements. I enjoy creating software, exploring new technologies, and making cool projects.</p>
+                <br>
+                <p>🟢 <span style="color: var(--accent3);">GitHub contributions are green today!</span></p>
+            </div>
+        </div>
+
+        <div id="skills" class="section">
+            <div class="card">
+                <h2>🛠️ Skills</h2>
+                <div class="skills-grid">
+                    <div class="skill-card"><span class="icon">🐍</span><span class="name">Python</span></div>
+                    <div class="skill-card"><span class="icon">🌐</span><span class="name">Web Dev</span></div>
+                    <div class="skill-card"><span class="icon">🤖</span><span class="name">AI/ML</span></div>
+                    <div class="skill-card"><span class="icon">📊</span><span class="name">Data Analysis</span></div>
+                    <div class="skill-card"><span class="icon">🎵</span><span class="name">Music</span></div>
+                    <div class="skill-card"><span class="icon">🎮</span><span class="name">Gaming</span></div>
+                    <div class="skill-card"><span class="icon">🔧</span><span class="name">Linux</span></div>
+                    <div class="skill-card"><span class="icon">📱</span><span class="name">Mobile</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="projects" class="section">
+            <div class="card">
+                <h2>📁 Projects</h2>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <h3>🟢 Daily Portfolio</h3>
+                        <p>A daily-updated interactive portfolio website with games and animations.</p>
+                        <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+                    </div>
+                    <div class="project-card">
+                        <h3>📊 Data Analysis</h3>
+                        <p>Exploring data patterns and insights using Python and statistics.</p>
+                        <span class="tag">Python</span><span class="tag">Pandas</span><span class="tag">Matplotlib</span>
+                    </div>
+                    <div class="project-card">
+                        <h3>🎵 Music Controller</h3>
+                        <p>Controlling Spotify playback via terminal and D-Bus commands.</p>
+                        <span class="tag">Bash</span><span class="tag">D-Bus</span><span class="tag">MPRIS</span>
+                    </div>
+                    <div class="project-card">
+                        <h3>🤖 AI Assistant</h3>
+                        <p>Interactive AI-powered assistant for various tasks.</p>
+                        <span class="tag">AI</span><span class="tag">NLP</span><span class="tag">Python</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="playground" class="section">
+            <div class="card">
+                <h2>🎮 Playground</h2>
+                <p>Interactive elements and mini-games!</p>
+            </div>
+            <div class="card">
+                <h3>🎯 Click Speed Test</h3>
+                <p>Click as fast as you can in 10 seconds!</p>
+                <div class="counter-display" id="speedScore">0</div>
+                <button class="btn" onclick="startSpeedTest()">Start Test</button>
+                <p id="speedTimer" style="color: #8b949e; margin-top: 10px;"></p>
+            </div>
+        </div>
+
+        <div id="contact" class="section">
+            <div class="card">
+                <h2>📡 Contact</h2>
+                <p>GitHub: <a href="https://github.com/rianpowder-droid" style="color: var(--accent2);">@rianpowder-droid</a></p>
+                <p style="margin-top: 15px;">Feel free to reach out for collaboration or just to say hi! 👋</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 RianPow. Built with ❤️ and GitHub Pages.</p>
+            <p class="green">🟢 Contributions are green today!</p>
+        </footer>
+    </div>
+
+    <script>
+        // Section navigation
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Click counter
+        let count = 0;
+        function incrementCounter() { count++; document.getElementById('counterValue').textContent = count; }
+        function resetCounter() { count = 0; document.getElementById('counterValue').textContent = 0; }
+
+        // Color picker
+        function randomColor() {
+            const colors = ['#f778ba', '#79c0ff', '#56d364', '#f0883e', '#d2a8ff', '#ff7b72'];
+            const c1 = colors[Math.floor(Math.random() * colors.length)];
+            const c2 = colors[Math.floor(Math.random() * colors.length)];
+            document.getElementById('colorBox').style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
+            document.getElementById('colorBox').textContent = c1 + ' → ' + c2;
+        }
+
+        // Typing effect
+        const phrases = ['Welcome to my portfolio!', 'Built with HTML, CSS & JS', 'Updated daily! 🚀', 'Green contributions every day! 🟢'];
+        let phraseIndex = 0, charIndex = 0, isDeleting = false;
+        function typeEffect() {
+            const current = phrases[phraseIndex];
+            if (isDeleting) {
+                document.getElementById('typingText').textContent = current.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                document.getElementById('typingText').textContent = current.substring(0, charIndex + 1);
+                charIndex++;
+            }
+            if (!isDeleting && charIndex === current.length) {
+                isDeleting = true;
+                setTimeout(typeEffect, 2000);
+                return;
+            }
+            if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+            }
+            setTimeout(typeEffect, isDeleting ? 50 : 100);
+        }
+        typeEffect();
+
+        // Speed test
+        let speedClicks = 0, speedTimer = null;
+        function startSpeedTest() {
+            speedClicks = 0;
+            document.getElementById('speedScore').textContent = 0;
+            document.getElementById('speedTimer').textContent = '10 seconds remaining...';
+            const btn = document.querySelector('#playground .btn');
+            btn.onclick = () => { speedClicks++; document.getElementById('speedScore').textContent = speedClicks; };
+            let timeLeft = 10;
+            speedTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('speedTimer').textContent = timeLeft + ' seconds remaining...';
+                if (timeLeft <= 0) {
+                    clearInterval(speedTimer);
+                    document.getElementById('speedTimer').textContent = 'Done! You clicked ' + speedClicks + ' times!';
+                    btn.onclick = null;
+                }
+            }, 1000);
+        }
+
+        // Particles
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDelay = Math.random() * 10 + 's';
+            p.style.animationDuration = (8 + Math.random() * 6) + 's';
+            const colors = ['#f778ba', '#79c0ff', '#56d364', '#f0883e'];
+            p.style.background = colors[Math.floor(Math.random() * colors.length)];
+            particlesContainer.appendChild(p);
+        }
+    </script>
+</body>
+</html>
+EOF
